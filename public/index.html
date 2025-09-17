@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦆 DuckAI Server - API Examples</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+        
+        .api-info {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #60a5fa;
+            margin-top: 1rem;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .example-card {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .example-title {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #60a5fa;
+        }
+        
+        .example-icon {
+            font-size: 2rem;
+            margin-right: 0.5rem;
+        }
+        
+        .code-block {
+            background: #0a0e1a;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .code-block pre {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #374151;
+            color: #e5e7eb;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #4b5563;
+        }
+        
+        .copy-btn.copied {
+            background: #059669;
+        }
+        
+        .description {
+            margin-bottom: 1rem;
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+        
+        .models-section {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .model-item {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #34d399;
+        }
+        
+        .model-name {
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+        }
+        
+        .model-provider {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .footer a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Syntax highlighting */
+        .keyword { color: #c792ea; }
+        .string { color: #a5d6ff; }
+        .comment { color: #546e7a; font-style: italic; }
+        .number { color: #f78c6c; }
+        .function { color: #82aaff; }
+        .variable { color: #ffcb6b; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .code-block {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦆 DuckAI Server API</h1>
+            <p>Serverless DuckDuckGo AI Chat API na Vercel</p>
+            <div class="api-info">
+                <strong>Endpoint:</strong> <code>POST /api/ask</code><br>
+                <strong>Content-Type:</strong> <code>application/json</code>
+            </div>
+        </div>
+        
+        <div class="examples-grid">
+            <!-- cURL Example -->
+            <div class="example-card">
+                <div class="example-title">
+                    <span class="example-icon">🔧</span>
+                    cURL (Terminal)
+                </div>
+                <div class="description">
+                    Gotowy przykład dla terminala Linux/macOS/Windows (WSL)
+                </div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this, 'curl')">Kopiuj</button>
+                    <pre id="curl-code">#!/bin/bash
+
+# Podstawowe zapytanie
+curl -X POST "https://your-deployment.vercel.app/api/ask" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [
+      {"role": "user", "content": "Cześć! Kim jesteś?"}
+    ],
+    "model": "gpt-5-mini"
+  }'
+
+# Z konkretnym modelem
+curl -X POST "https://your-deployment.vercel.app/api/ask" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [
+      {"role": "user", "content": "Wyjaśnij obliczenia kwantowe"}
+    ],
+    "model": "claude-3-5-haiku-latest"
+  }'
+
+# Konwersacja z historią
+curl -X POST "https://your-deployment.vercel.app/api/ask" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [
+      {"role": "user", "content": "Jak działa AI?"},
+      {"role": "assistant", "content": "AI to..."},
+      {"role": "user", "content": "A machine learning?"}
+    ],
+    "model": "gpt-5-mini"
+  }'</pre>
+                </div>
+            </div>
+            
+            <!-- Python Example -->
+            <div class="example-card">
+                <div class="example-title">
+                    <span class="example-icon">🐍</span>
+                    Python (requests)
+                </div>
+                <div class="description">
+                    Implementacja w Pythonie z obsługą błędów i konwersacji
+                </div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this, 'python')">Kopiuj</button>
+                    <pre id="python-code"><span class="keyword">import</span> requests
+<span class="keyword">import</span> json
+<span class="keyword">from</span> typing <span class="keyword">import</span> List, Dict
+
+<span class="keyword">class</span> <span class="function">DuckAIClient</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="variable">self</span>, <span class="variable">base_url</span>: <span class="keyword">str</span>):
+        <span class="variable">self.base_url</span> = <span class="variable">base_url</span>.rstrip(<span class="string">'/'</span>)
+        <span class="variable">self.conversation</span> = []
+    
+    <span class="keyword">def</span> <span class="function">ask</span>(<span class="variable">self</span>, <span class="variable">message</span>: <span class="keyword">str</span>, <span class="variable">model</span>: <span class="keyword">str</span> = <span class="string">"gpt-5-mini"</span>) -> <span class="keyword">str</span>:
+        <span class="comment"># Dodaj wiadomość użytkownika do konwersacji</span>
+        <span class="variable">self.conversation</span>.append({
+            <span class="string">"role"</span>: <span class="string">"user"</span>,
+            <span class="string">"content"</span>: <span class="variable">message</span>
+        })
+        
+        <span class="variable">payload</span> = {
+            <span class="string">"messages"</span>: <span class="variable">self.conversation</span>,
+            <span class="string">"model"</span>: <span class="variable">model</span>
+        }
+        
+        <span class="keyword">try</span>:
+            <span class="variable">response</span> = requests.post(
+                <span class="variable">f"{self.base_url}/api/ask"</span>,
+                <span class="variable">json</span>=<span class="variable">payload</span>,
+                <span class="variable">headers</span>={<span class="string">"Content-Type"</span>: <span class="string">"application/json"</span>},
+                <span class="variable">timeout</span>=<span class="number">60</span>
+            )
+            <span class="variable">response.raise_for_status()</span>
+            
+            <span class="variable">result</span> = <span class="variable">response.json()</span>
+            <span class="variable">answer</span> = <span class="variable">result</span>[<span class="string">"answer"</span>]
+            
+            <span class="comment"># Dodaj odpowiedź AI do konwersacji</span>
+            <span class="variable">self.conversation</span>.append({
+                <span class="string">"role"</span>: <span class="string">"assistant"</span>,
+                <span class="string">"content"</span>: <span class="variable">answer</span>
+            })
+            
+            <span class="keyword">return</span> <span class="variable">answer</span>
+            
+        <span class="keyword">except</span> requests.exceptions.RequestException <span class="keyword">as</span> <span class="variable">e</span>:
+            <span class="keyword">return</span> <span class="variable">f"Błąd żądania: {e}"</span>
+        <span class="keyword">except</span> KeyError:
+            <span class="keyword">return</span> <span class="string">"Błąd: Nieprawidłowa odpowiedź API"</span>
+    
+    <span class="keyword">def</span> <span class="function">clear_conversation</span>(<span class="variable">self</span>):
+        <span class="variable">self.conversation</span> = []
+
+<span class="comment"># Przykład użycia</span>
+<span class="keyword">if</span> <span class="variable">__name__</span> == <span class="string">"__main__"</span>:
+    <span class="variable">client</span> = <span class="function">DuckAIClient</span>(<span class="string">"https://your-deployment.vercel.app"</span>)
+    
+    <span class="variable">response1</span> = <span class="variable">client</span>.<span class="function">ask</span>(<span class="string">"Cześć! Co potrafisz?"</span>)
+    print(<span class="variable">f"AI: {response1}"</span>)
+    
+    <span class="variable">response2</span> = <span class="variable">client</span>.<span class="function">ask</span>(<span class="string">"Opowiedz o programowaniu"</span>, <span class="string">"claude-3-5-haiku-latest"</span>)
+    print(<span class="variable">f"AI: {response2}"</span>)</pre>
+                </div>
+            </div>
+            
+            <!-- JavaScript Example -->
+            <div class="example-card">
+                <div class="example-title">
+                    <span class="example-icon">⚡</span>
+                    JavaScript (Fetch)
+                </div>
+                <div class="description">
+                    Implementacja dla przeglądarki i Node.js z async/await
+                </div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this, 'javascript')">Kopiuj</button>
+                    <pre id="javascript-code"><span class="keyword">class</span> <span class="function">DuckAIClient</span> {
+    <span class="keyword">constructor</span>(<span class="variable">baseUrl</span>) {
+        <span class="keyword">this</span>.<span class="variable">baseUrl</span> = <span class="variable">baseUrl</span>.<span class="function">replace</span>(<span class="string">/\/$/<span>/<span>, <span class="string">''</span>);
+        <span class="keyword">this</span>.<span class="variable">conversation</span> = [];
+    }
+    
+    <span class="keyword">async</span> <span class="function">ask</span>(<span class="variable">message</span>, <span class="variable">model</span> = <span class="string">'gpt-5-mini'</span>) {
+        <span class="comment">// Dodaj wiadomość użytkownika do konwersacji</span>
+        <span class="keyword">this</span>.<span class="variable">conversation</span>.<span class="function">push</span>({
+            <span class="variable">role</span>: <span class="string">'user'</span>,
+            <span class="variable">content</span>: <span class="variable">message</span>
+        });
+        
+        <span class="keyword">const</span> <span class="variable">payload</span> = {
+            <span class="variable">messages</span>: <span class="keyword">this</span>.<span class="variable">conversation</span>,
+            <span class="variable">model</span>: <span class="variable">model</span>
+        };
+        
+        <span class="keyword">try</span> {
+            <span class="keyword">const</span> <span class="variable">response</span> = <span class="keyword">await</span> <span class="function">fetch</span>(<span class="variable">`${this.baseUrl}/api/ask`</span>, {
+                <span class="variable">method</span>: <span class="string">'POST'</span>,
+                <span class="variable">headers</span>: {
+                    <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>,
+                },
+                <span class="variable">body</span>: <span class="function">JSON.stringify</span>(<span class="variable">payload</span>)
+            });
+            
+            <span class="keyword">if</span> (!<span class="variable">response</span>.<span class="variable">ok</span>) {
+                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="function">Error</span>(<span class="variable">`HTTP error! status: ${response.status}`</span>);
+            }
+            
+            <span class="keyword">const</span> <span class="variable">result</span> = <span class="keyword">await</span> <span class="variable">response</span>.<span class="function">json</span>();
+            <span class="keyword">const</span> <span class="variable">answer</span> = <span class="variable">result</span>.<span class="variable">answer</span>;
+            
+            <span class="comment">// Dodaj odpowiedź AI do konwersacji</span>
+            <span class="keyword">this</span>.<span class="variable">conversation</span>.<span class="function">push</span>({
+                <span class="variable">role</span>: <span class="string">'assistant'</span>,
+                <span class="variable">content</span>: <span class="variable">answer</span>
+            });
+            
+            <span class="keyword">return</span> {
+                <span class="variable">answer</span>,
+                <span class="variable">model</span>: <span class="variable">result</span>.<span class="variable">model</span>,
+                <span class="variable">processingTime</span>: <span class="variable">result</span>.<span class="variable">processingTime</span>
+            };
+            
+        } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+            console.<span class="function">error</span>(<span class="string">'DuckAI Error:'</span>, <span class="variable">error</span>);
+            <span class="keyword">throw</span> <span class="variable">error</span>;
+        }
+    }
+    
+    <span class="function">clearConversation</span>() {
+        <span class="keyword">this</span>.<span class="variable">conversation</span> = [];
+    }
+    
+    <span class="function">getConversation</span>() {
+        <span class="keyword">return</span> [...<span class="keyword">this</span>.<span class="variable">conversation</span>];
+    }
+}
+
+<span class="comment">// Przykład użycia</span>
+(<span class="keyword">async</span> () => {
+    <span class="keyword">const</span> <span class="variable">client</span> = <span class="keyword">new</span> <span class="function">DuckAIClient</span>(<span class="string">'https://your-deployment.vercel.app'</span>);
+    
+    <span class="keyword">try</span> {
+        <span class="keyword">const</span> <span class="variable">result1</span> = <span class="keyword">await</span> <span class="variable">client</span>.<span class="function">ask</span>(<span class="string">'Cześć! Jak się masz?'</span>);
+        console.<span class="function">log</span>(<span class="string">'AI:'</span>, <span class="variable">result1</span>.<span class="variable">answer</span>);
+        
+        <span class="keyword">const</span> <span class="variable">result2</span> = <span class="keyword">await</span> <span class="variable">client</span>.<span class="function">ask</span>(<span class="string">'Opowiedz o JavaScript'</span>, <span class="string">'claude-3-5-haiku-latest'</span>);
+        console.<span class="function">log</span>(<span class="string">'AI:'</span>, <span class="variable">result2</span>.<span class="variable">answer</span>);
+        
+    } <span class="keyword">catch</span> (<span class="variable">error</span>) {
+        console.<span class="function">error</span>(<span class="string">'Błąd:'</span>, <span class="variable">error</span>.<span class="variable">message</span>);
+    }
+})();</pre>
+                </div>
+            </div>
+        </div>
+        
+        <div class="models-section">
+            <h2 style="color: #60a5fa; margin-bottom: 1rem;">📋 Dostępne Modele AI</h2>
+            <div class="models-grid">
+                <div class="model-item">
+                    <div class="model-name">gpt-5-mini</div>
+                    <div class="model-provider">OpenAI • Domyślny • Najszybszy</div>
+                </div>
+                <div class="model-item">
+                    <div class="model-name">gpt-4o-mini</div>
+                    <div class="model-provider">OpenAI • Zoptymalizowany GPT-4</div>
+                </div>
+                <div class="model-item">
+                    <div class="model-name">claude-3-5-haiku-latest</div>
+                    <div class="model-provider">Anthropic • Najnowszy Claude</div>
+                </div>
+                <div class="model-item">
+                    <div class="model-name">mistralai/Mistral-Small-24B-Instruct-2501</div>
+                    <div class="model-provider">Mistral AI • Zaawansowane rozumowanie</div>
+                </div>
+                <div class="model-item">
+                    <div class="model-name">meta-llama/Llama-4-Scout-17B-16E-Instruct</div>
+                    <div class="model-provider">Meta • Najnowszy Llama</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🦆 <strong>DuckAI Server</strong> - Serverless deployment na Vercel</p>
+            <p>Bazowane na <a href="https://github.com/MyHoldFast/duckai-server" target="_blank">duckai-server</a> by MyHoldFast</p>
+            <p><a href="https://github.com/arturwyroslak/vercel-duck" target="_blank">Zobacz na GitHub</a></p>
+        </div>
+    </div>
+    
+    <script>
+        function copyCode(button, type) {
+            const codeElement = document.getElementById(type + '-code');
+            const text = codeElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = 'Skopiowane!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = 'Kopiuj';
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Błąd kopiowania:', err);
+                button.textContent = 'Błąd';
+                setTimeout(() => {
+                    button.textContent = 'Kopiuj';
+                }, 2000);
+            });
+        }
+        
+        // Automatyczne zastąpienie URL-a
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUrl = window.location.origin;
+            const codeBlocks = document.querySelectorAll('pre');
+            
+            codeBlocks.forEach(block => {
+                block.innerHTML = block.innerHTML.replace(
+                    /https:\/\/your-deployment\.vercel\.app/g,
+                    currentUrl
+                );
+            });
+        });
+    </script>
+</body>
+</html>
