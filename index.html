@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DuckAI Server - Vercel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .api-info {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        
+        .endpoint {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+            word-break: break-all;
+        }
+        
+        .models {
+            margin-top: 2rem;
+        }
+        
+        .model-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .model-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .features {
+            margin-top: 2rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        
+        .feature-list li {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .feature-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4ade80;
+            font-weight: bold;
+        }
+        
+        .github-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .github-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦆 DuckAI Server</h1>
+        <p class="subtitle">DuckDuckGo AI Chat API optimized for Vercel serverless deployment</p>
+        
+        <div class="api-info">
+            <h3>📡 API Endpoint</h3>
+            <div class="endpoint">POST /api/ask</div>
+            
+            <h4 style="margin-top: 1rem;">Request Body:</h4>
+            <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 5px; margin: 0.5rem 0; text-align: left; overflow-x: auto;">{
+  "messages": [
+    {"role": "user", "content": "Hello, who are you?"}
+  ],
+  "model": "gpt-5-mini"
+}</pre>
+            
+            <h4 style="margin-top: 1rem;">cURL Example:</h4>
+            <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 5px; margin: 0.5rem 0; text-align: left; overflow-x: auto; font-size: 0.8rem;">curl -X POST https://your-deployment.vercel.app/api/ask \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"Hello!"}]}'</pre>
+        </div>
+        
+        <div class="models">
+            <h3>🤖 Available Models</h3>
+            <div class="model-list">
+                <div class="model-item">claude-3-5-haiku-latest</div>
+                <div class="model-item">mistralai/Mistral-Small-24B-Instruct-2501</div>
+                <div class="model-item">meta-llama/Llama-4-Scout-17B-16E-Instruct</div>
+                <div class="model-item">gpt-4o-mini</div>
+                <div class="model-item">gpt-5-mini (default)</div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h3>⚡ Features</h3>
+            <ul class="feature-list">
+                <li>Serverless deployment on Vercel</li>
+                <li>Automatic CAPTCHA solving with Gemini Vision</li>
+                <li>Memory optimized for serverless functions</li>
+                <li>Resource blocking for faster responses</li>
+                <li>Browser instance caching</li>
+                <li>Multiple AI model support</li>
+                <li>CORS enabled for web applications</li>
+            </ul>
+        </div>
+        
+        <a href="https://github.com/arturwyroslak/vercel-duck" class="github-link" target="_blank">
+            🔗 View on GitHub
+        </a>
+        
+        <p style="margin-top: 2rem; opacity: 0.7; font-size: 0.9rem;">
+            Based on <a href="https://github.com/MyHoldFast/duckai-server" style="color: #fbbf24;">duckai-server</a> by MyHoldFast<br>
+            Adapted for Vercel serverless deployment
+        </p>
+    </div>
+</body>
+</html>
