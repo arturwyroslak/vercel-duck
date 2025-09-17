@@ -1,0 +1,18 @@
+{
+  "functions": {
+    "api/ask.js": {
+      "memory": 3008,
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/ask",
+      "dest": "api/ask.js"
+    },
+    {
+      "src": "/",
+      "dest": "index.html"
+    }
+  ]
+}
