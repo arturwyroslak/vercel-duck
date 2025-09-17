@@ -19,7 +19,7 @@
   "author": "MyHoldFast (adapted for Vercel)",
   "license": "MIT",
   "dependencies": {
-    "@sparticuz/chromium": "^128.0.0",
+    "@sparticuz/chromium": "^130.0.0",
     "playwright-core": "^1.48.0",
     "axios": "^1.7.7"
   }
