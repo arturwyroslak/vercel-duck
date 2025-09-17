@@ -117,11 +117,7 @@ async function configurePage(page) {
     Object.defineProperty(navigator, 'platform', { get: () => 'Win32' });
   });
 
-  await page.setUserAgent(
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-  );
-
-  await page.setViewport({ width: CAPTCHA_CONFIG.VIEW_W, height: CAPTCHA_CONFIG.VIEW_H });
+  await page.setViewportSize({ width: CAPTCHA_CONFIG.VIEW_W, height: CAPTCHA_CONFIG.VIEW_H });
 }
 
 /**
@@ -233,7 +229,9 @@ async function clickCaptcha(page, matrix) {
  */
 async function initializeChatPage() {
   const browser = await getBrowser();
-  const context = await browser.newContext();
+  const context = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+  });
   const page = await context.newPage();
   
   await configurePage(page);
