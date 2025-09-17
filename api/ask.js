@@ -57,17 +57,39 @@ async function getBrowser() {
   }
 
   if (!browserInstance) {
-    const executablePath = await chromium.executablePath();
-    
-    // Convert @sparticuz/chromium headless value to Playwright-compatible boolean
-    // @sparticuz/chromium returns 'shell' but Playwright 1.55.0 only accepts boolean
-    const headlessMode = chromium.headless === 'shell' || chromium.headless === 'new' || chromium.headless === true || chromium.headless === 'true';
-    
-    browserInstance = await playwright.chromium.launch({
-      args: chromium.args,
-      executablePath,
-      headless: headlessMode,
-    });
+    try {
+      const executablePath = await chromium.executablePath();
+      console.log('Launching browser with executable:', executablePath);
+      
+      // Handle headless mode for different @sparticuz/chromium versions
+      // Newer versions may return undefined, older versions return 'shell'
+      const headlessMode = chromium.headless === 'shell' || chromium.headless === 'new' || chromium.headless === true || chromium.headless === 'true' || chromium.headless === undefined;
+      
+      // Ensure proper Vercel serverless environment args
+      const args = [
+        ...chromium.args,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-web-security',
+        '--no-zygote',
+        '--single-process'
+      ];
+      
+      browserInstance = await playwright.chromium.launch({
+        args,
+        executablePath,
+        headless: headlessMode,
+      });
+      
+      console.log('Browser launched successfully');
+    } catch (error) {
+      console.error('Browser launch failed:', error.message);
+      console.error('Chromium executable path:', await chromium.executablePath().catch(() => 'unknown'));
+      console.error('Chromium args count:', chromium.args.length);
+      console.error('Chromium headless:', chromium.headless);
+      throw new Error(`Browser launch failed: ${error.message}`);
+    }
   }
 
   lastUsed = Date.now();

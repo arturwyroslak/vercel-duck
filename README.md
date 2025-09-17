@@ -191,8 +191,15 @@ console.log(data.answer);
 - Check target website responsiveness
 
 **4. Browser Launch Failed**
-- Ensure `@sparticuz/chromium` version compatibility
-- Check Vercel function logs for detailed errors
+- Updated to latest `@sparticuz/chromium` version (138.x) for better Vercel compatibility
+- Ensure proper serverless environment configuration in `vercel.json`
+- Check Vercel function logs for detailed browser launch errors:
+  ```bash
+  vercel logs
+  ```
+- Common errors:
+  - `libnss3.so not found`: Fixed in latest chromium versions
+  - Memory issues: Ensure 3008MB memory allocation in Vercel Pro plan
 
 ### Debugging
 
