@@ -59,10 +59,14 @@ async function getBrowser() {
   if (!browserInstance) {
     const executablePath = await chromium.executablePath();
     
+    // Convert @sparticuz/chromium headless value to Playwright-compatible boolean
+    // @sparticuz/chromium returns 'shell' but Playwright 1.55.0 only accepts boolean
+    const headlessMode = chromium.headless === 'shell' || chromium.headless === 'new' || chromium.headless === true || chromium.headless === 'true';
+    
     browserInstance = await playwright.chromium.launch({
       args: chromium.args,
       executablePath,
-      headless: chromium.headless,
+      headless: headlessMode,
     });
   }
 
