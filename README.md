@@ -3,7 +3,6 @@
 A **serverless DuckDuckGo AI chat API** optimized for deployment on **Vercel**. This is an adapted version of [duckai-server](https://github.com/MyHoldFast/duckai-server) by MyHoldFast, specifically optimized for Vercel's serverless environment using `@sparticuz/chromium` and `playwright-core`.
 
 ## ✨ Features
-
 - 🚀 **Serverless deployment** on Vercel
 - 🤖 **Multiple AI models** support (GPT, Claude, Llama, Mistral)
 - 🧠 **Automatic CAPTCHA solving** using Gemini Vision API
