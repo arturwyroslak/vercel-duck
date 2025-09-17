@@ -18,6 +18,7 @@
   ],
   "author": "MyHoldFast (adapted for Vercel)",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "@sparticuz/chromium": "^130.0.0",
     "axios": "1.7.7",

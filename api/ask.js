@@ -2,9 +2,9 @@
 // Based on original duckai-server by MyHoldFast
 // Adapted for Vercel serverless functions using @sparticuz/chromium
 
-const chromium = require('@sparticuz/chromium');
-const playwright = require('playwright-core');
-const axios = require('axios');
+import chromium from '@sparticuz/chromium';
+import playwright from 'playwright-core';
+import axios from 'axios';
 
 // Configuration constants
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'your_free_gemini_key';
