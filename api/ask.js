@@ -309,7 +309,7 @@ async function initializeChatPage() {
     // Final attempt: wait for any visible input element
     try {
       await page.waitForFunction(() => {
-        const inputs = document.querySelectorAll('textarea, input[type="text"], div[contenteditable="true"]');
+        const inputs = document.querySelectorAll('textarea, input[type="text"], div[contenteditable="true"], div[contenteditable]');
         return Array.from(inputs).some(input => {
           const style = window.getComputedStyle(input);
           return style.display !== 'none' && style.visibility !== 'hidden' && input.offsetParent !== null;
