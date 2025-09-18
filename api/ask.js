@@ -257,14 +257,69 @@ async function initializeChatPage() {
 
   await page.goto(
     'https://duckduckgo.com/?q=test&ia=chat&duckai=1',
-    { waitUntil: 'domcontentloaded' }
+    { waitUntil: 'networkidle', timeout: 30000 }
   );
 
-  // Wait for input field
+  // Wait for page to be ready and chat interface to load
   try {
-    await page.waitForSelector('textarea[name="user-prompt"]', { timeout: 10000 });
-  } catch {
-    await page.waitForSelector('div[contenteditable="true"]', { timeout: 10000 });
+    await page.waitForFunction(() => {
+      // Check if the page has loaded the chat interface
+      const hasChat = document.body.textContent.includes('chat') || 
+                     document.querySelector('[data-testid*="chat"]') ||
+                     document.querySelector('.chat') ||
+                     document.body.innerHTML.includes('duckai');
+      const hasInputs = document.querySelectorAll('textarea, input, div[contenteditable]').length > 0;
+      return hasChat && hasInputs;
+    }, { timeout: 20000 });
+    console.log('Chat interface detected, proceeding with input field search');
+  } catch (error) {
+    console.log('Chat interface check timeout, proceeding anyway:', error.message);
+  }
+
+  // Wait for input field with multiple fallbacks
+  const inputSelectors = [
+    'textarea[name="user-prompt"]',
+    'div[contenteditable="true"]',
+    'textarea[placeholder*="Ask"]',
+    'textarea[placeholder*="chat"]',
+    'div[role="textbox"]',
+    'input[type="text"][placeholder*="Ask"]',
+    '.chat-input textarea',
+    '.input-wrapper textarea',
+    '[data-testid="chat-input"]'
+  ];
+
+  let inputFound = false;
+  const selectorTimeout = 15000; // Increased timeout for serverless environment
+  
+  for (const selector of inputSelectors) {
+    try {
+      console.log(`Trying selector: ${selector}`);
+      await page.waitForSelector(selector, { timeout: selectorTimeout });
+      console.log(`Success with selector: ${selector}`);
+      inputFound = true;
+      break;
+    } catch (error) {
+      console.log(`Selector "${selector}" failed: ${error.message}`);
+      continue;
+    }
+  }
+
+  if (!inputFound) {
+    // Final attempt: wait for any visible input element
+    try {
+      await page.waitForFunction(() => {
+        const inputs = document.querySelectorAll('textarea, input[type="text"], div[contenteditable="true"]');
+        return Array.from(inputs).some(input => {
+          const style = window.getComputedStyle(input);
+          return style.display !== 'none' && style.visibility !== 'hidden' && input.offsetParent !== null;
+        });
+      }, { timeout: 10000 });
+      console.log('Found input element via fallback function');
+    } catch (error) {
+      console.error('All input selector attempts failed:', error.message);
+      throw new Error('Could not find chat input field - DuckDuckGo UI may have changed');
+    }
   }
 
   return { page, context, getHeaders: () => headers };
@@ -293,9 +348,17 @@ async function refreshHeaders(page) {
   // Trigger input field to generate headers
   const inputSelectors = [
     'textarea[name="user-prompt"]',
-    'div[contenteditable="true"]'
+    'div[contenteditable="true"]',
+    'textarea[placeholder*="Ask"]',
+    'textarea[placeholder*="chat"]',
+    'div[role="textbox"]',
+    'input[type="text"][placeholder*="Ask"]',
+    '.chat-input textarea',
+    '.input-wrapper textarea',
+    '[data-testid="chat-input"]'
   ];
 
+  let headerTriggered = false;
   for (const selector of inputSelectors) {
     try {
       const input = await page.waitForSelector(selector, { timeout: 5000 });
@@ -303,8 +366,31 @@ async function refreshHeaders(page) {
       await input.fill(' ');
       await page.keyboard.press('Enter');
       await page.waitForTimeout(500);
+      headerTriggered = true;
       break;
     } catch {}
+  }
+  
+  // Final fallback: try to find any visible input and interact with it
+  if (!headerTriggered) {
+    try {
+      await page.evaluate(() => {
+        const inputs = document.querySelectorAll('textarea, input[type="text"], div[contenteditable="true"]');
+        for (const input of inputs) {
+          const style = window.getComputedStyle(input);
+          if (style.display !== 'none' && style.visibility !== 'hidden' && input.offsetParent !== null) {
+            input.focus();
+            input.value = ' ';
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
+            return true;
+          }
+        }
+        return false;
+      });
+    } catch (error) {
+      console.log('Header refresh fallback failed:', error.message);
+    }
   }
 }
 
